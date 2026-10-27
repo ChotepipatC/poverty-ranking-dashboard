@@ -276,18 +276,18 @@ footer p{margin:0 0 4px;}
 @media (prefers-reduced-motion: reduce){
   .rrow,.rbar,.rnat{transition:none !important;}
 }
-/* chart + dynamic bar chart side by side on tablet and desktop */
-.toprow{display:grid; grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); gap:16px; align-items:start;}
-.toprow > .card{margin-bottom:16px;}
-@media (min-width:768px){
-  .toprow > .card:last-child{position:sticky; top:12px;}
-}
+/* rank chart + dynamic bar chart share one row (equal height); the rate chart spans both below */
+.cgrid{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:16px; align-items:stretch; margin-top:4px;}
+.cell{border:1px solid var(--rule); border-radius:8px; padding:10px 12px; min-width:0; display:flex; flex-direction:column;}
+.cell.wide{margin-top:16px;}
+.cell h3{font-size:15px; font-weight:600; margin:0 0 2px;}
 @media (min-width:768px) and (max-width:1099px){
-  .toprow{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+  .cgrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
 }
 @media (max-width:767px){
-  .toprow{grid-template-columns:minmax(0,1fr); gap:0;}
-  .toprow > .card:last-child{order:-1;}
+  .cgrid{grid-template-columns:minmax(0,1fr); gap:12px;}
+  #cellRace{order:-1;}
+  .cell{padding:8px;}
 }
 .race.narrow{--lw:116px; --rr:62px;}
 .race.narrow.reg{--lw:140px;}
@@ -341,40 +341,44 @@ footer p{margin:0 0 4px;}
     </div>
   </div>
 
-  <div class="toprow">
   <section class="card" aria-labelledby="h-chart">
     <h2 id="h-chart">อันดับและสัดส่วนคนจนรายปี</h2>
     <p class="hint" id="chartHint"></p>
     <p class="hint" id="scrollHint" hidden>เลื่อนกราฟไปทางซ้ายหรือขวาเพื่อดูทุกปี</p>
     <div class="legend" id="legend"></div>
-    <div class="scroller" id="scroller">
-      <div class="chart-title">อันดับ (1 = สัดส่วนคนจนสูงสุด)</div>
-      <svg id="bumpSvg" role="img" aria-label="กราฟอันดับสัดส่วนคนจนตามปี"></svg>
+    <div class="cgrid">
+      <div class="cell" id="cellRank">
+        <div class="chart-title" id="bumpTitle">อันดับ (1 = สัดส่วนคนจนสูงสุด)</div>
+        <div class="scroller" id="scroller">
+          <svg id="bumpSvg" role="img" aria-label="กราฟอันดับสัดส่วนคนจนตามปี"></svg>
+        </div>
+      </div>
+      <div class="cell" id="cellRace">
+        <div class="racehead" id="racehead">
+          <div>
+            <h3 id="h-race">Dynamic bar chart: สัดส่วนคนจนรายปี</h3>
+            <p class="hint" id="raceHint"></p>
+          </div>
+          <div class="racetools">
+            <button class="btn" id="playBtn2" type="button" aria-label="เล่นต่อเนื่องทีละปีสำรวจ">เล่น</button>
+            <span class="lab" id="lab-s">ความเร็ว</span>
+            <div class="seg" id="segSpd" role="group" aria-labelledby="lab-s"></div>
+          </div>
+        </div>
+        <div class="race" id="race" role="img" aria-label="แผนภูมิแท่งสัดส่วนคนจนเรียงจากมากไปน้อยตามปีที่เลือก">
+          <div class="rplot" id="rplot"><div class="rgrid" id="rgrid"></div><div class="rnat" id="rnat"><span class="rnatl" id="rnatl"></span></div></div>
+          <div class="rrows" id="rrows"></div>
+          <div class="ryear" id="ryear"></div>
+        </div>
+      </div>
+    </div>
+    <div class="cell wide">
       <div class="chart-title">สัดส่วนคนจน (ร้อยละของประชากร)</div>
-      <svg id="rateSvg" role="img" aria-label="กราฟสัดส่วนคนจนของกลุ่มเดียวกันตามปี"></svg>
-    </div>
-  </section>
-
-  <section class="card" aria-labelledby="h-race">
-    <div class="racehead">
-      <div>
-        <h2 id="h-race">Dynamic bar chart: สัดส่วนคนจนรายปี</h2>
-        <p class="hint" id="raceHint"></p>
-      </div>
-      <div class="racetools">
-        <button class="btn" id="playBtn2" type="button" aria-label="เล่นต่อเนื่องทีละปีสำรวจ">เล่น</button>
-        <span class="lab" id="lab-s">ความเร็ว</span>
-        <div class="seg" id="segSpd" role="group" aria-labelledby="lab-s"></div>
+      <div class="scroller" id="scrollerR">
+        <svg id="rateSvg" role="img" aria-label="กราฟสัดส่วนคนจนของกลุ่มเดียวกันตามปี"></svg>
       </div>
     </div>
-    <div class="race" id="race" role="img" aria-label="แผนภูมิแท่งสัดส่วนคนจนเรียงจากมากไปน้อยตามปีที่เลือก">
-      <div class="rplot" id="rplot"><div class="rgrid" id="rgrid"></div><div class="rnat" id="rnat"><span class="rnatl" id="rnatl"></span></div></div>
-      <div class="rrows" id="rrows"></div>
-      <div class="ryear" id="ryear"></div>
-    </div>
   </section>
-
-  </div>
 
   <div class="grid2">
     <section class="card" aria-labelledby="h-rank">
@@ -457,15 +461,19 @@ const nameHtml = p => isReg() ? rlink(p) : `<b>${p}</b>`;
 const M = { l: 142, r: 142, t: 16, b: 34 };
 let STEP = 38, PLOTW = 0, W = 0, RX0 = X0;
 let COMPACT = false;
-function setGeom() {
-  const cw = $('scroller').clientWidth || 900;
-  COMPACT = cw < 800;
-  M.l = M.r = isReg() ? (COMPACT ? 128 : 210) : (COMPACT ? 128 : 142);
-  RX0 = Y[S.a];
+// geometry is computed per chart (the rank chart is narrow, the rate chart spans the full width) and stored on its <svg>
+function geomFor(el, kind) {
+  const cw = el.clientWidth || 600;
+  const g = { t: 16, b: 34, compact: cw < 800 };
+  if (kind === 'rate') { g.l = g.compact ? 50 : 56; g.r = g.compact ? 124 : 150; }
+  else g.l = g.r = isReg() ? (g.compact ? 128 : 210) : (g.compact ? 118 : 142);
+  g.rx0 = Y[S.a];
   const span = Y[S.b] - Y[S.a];
-  STEP = Math.min(90, Math.max(COMPACT ? 24 : 30, (cw - M.l - M.r) / span));
-  PLOTW = span * STEP; W = M.l + PLOTW + M.r;
+  g.step = Math.min(90, Math.max(g.compact ? 20 : 30, (cw - g.l - g.r) / span));
+  g.plotw = span * g.step; g.w = g.l + g.plotw + g.r;
+  return g;
 }
+function useGeom(g) { M.l = g.l; M.r = g.r; M.t = g.t; M.b = g.b; STEP = g.step; PLOTW = g.plotw; W = g.w; RX0 = g.rx0; COMPACT = g.compact; }
 function svgPoint(e, svg) {
   const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
   return { x: (e.clientX - r.left) * vb.width / r.width, y: (e.clientY - r.top) * vb.height / r.height, H: vb.height };
@@ -527,12 +535,20 @@ function nameText(p, x, y, anchor) {
   return `<text ${attr}${st} x="${x}" y="${y}" text-anchor="${anchor}">${p}</text>`;
 }
 
+// in the two-column layout the rank chart is stretched so its box is as tall as the dynamic bar chart box
+function fitRowH(n) {
+  const base = n <= 5 ? 40 : n <= 10 ? 34 : n <= 15 ? 30 : 26;
+  if (!window.matchMedia('(min-width:768px)').matches || n < 2) return base;
+  const target = $('racehead').offsetHeight + $('race').offsetHeight;
+  const avail = target - $('bumpTitle').offsetHeight - 8 - (M.t + M.b + 6);
+  return Math.max(22, Math.min(60, avail / (n - 1)));
+}
 function renderBump() {
-  setGeom();
-  const n = nEff(), rowH = n <= 5 ? 40 : n <= 10 ? 34 : n <= 15 ? 30 : 26;
+  const G = geomFor($('scroller'), 'bump'); useGeom(G);
+  const n = nEff(), rowH = fitRowH(n);
   const H = M.t + (n - 1) * rowH + M.b + 6;
   const YR = r => M.t + (r - 1) * rowH;
-  const svg = $('bumpSvg');
+  const svg = $('bumpSvg'); svg.__g = G;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.width = W + 'px';
   let s = yearAxis(H - 10, M.t - 10, H - M.b + 8);
   for (let r = 1; r <= n; r++) s += `<line class="gridline" x1="${M.l - 6}" x2="${M.l + PLOTW + 6}" y1="${YR(r)}" y2="${YR(r)}"></line>`;
@@ -565,6 +581,7 @@ function renderBump() {
 }
 
 function renderRate() {
+  const G = geomFor($('scrollerR'), 'rate'); useGeom(G);
   const H = 300, t = 14, b = 34, plotH = H - t - b;
   const grp = groupList();
   let hi = 0;
@@ -572,7 +589,7 @@ function renderRate() {
   for (let i = S.a; i <= S.b; i++) if (REF.rate[i] > hi) hi = REF.rate[i];
   hi = Math.max(20, Math.ceil(hi / 10) * 10);
   const YV = v => t + (1 - v / hi) * plotH;
-  const svg = $('rateSvg');
+  const svg = $('rateSvg'); svg.__g = G;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.style.width = W + 'px';
   let s = yearAxis(H - 10, t - 4, H - b + 8);
   const ticks = hi <= 40 ? 10 : 20;
@@ -849,7 +866,7 @@ function renderAll() {
   renderHeadline(); renderRace(); renderBump(); renderRate(); renderRank(); renderDetail();
   applyHover(); scrollHint();
 }
-function scrollHint() { const sc = $('scroller'); $('scrollHint').hidden = !(sc.scrollWidth > sc.clientWidth + 4); }
+function scrollHint() { $('scrollHint').hidden = !['scroller', 'scrollerR'].some(id => $(id).scrollWidth > $(id).clientWidth + 4); }
 function rangeChanged() { if (!S.manual) S.hl = defaultHl(); renderAll(); }
 function setYear(i) { S.yi = Math.max(S.a, Math.min(S.b, i)); renderAll(); }
 function addHl(p) {
@@ -876,9 +893,11 @@ function resetAll() {
   applyScope(true); renderAll();
 }
 function applyHover() {
-  const sc = $('scroller');
-  sc.classList.toggle('hasHov', !!S.hover);
-  sc.querySelectorAll('.pv').forEach(g => g.classList.toggle('hov', g.dataset.p === S.hover));
+  ['scroller', 'scrollerR'].forEach(id => {
+    const sc = $(id);
+    sc.classList.toggle('hasHov', !!S.hover);
+    sc.querySelectorAll('.pv').forEach(g => g.classList.toggle('hov', g.dataset.p === S.hover));
+  });
 }
 
 /* ---------- tooltip ---------- */
@@ -957,9 +976,15 @@ const hideTip = () => { $('tip').hidden = true; };
   document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('a.rlink[data-region]')) { e.preventDefault(); drillRegion(e.target.dataset.region); } });
   document.addEventListener('click', e => { const b = e.target.closest('button[data-rm]'); if (b) removeHl(b.dataset.rm); });
 
-  const sc = $('scroller');
+  const hoverBand = i => document.querySelectorAll('#scroller svg, #scrollerR svg').forEach(s => {
+    const r = s.querySelector('.hband'); if (!r || !s.__g) return;
+    if (i == null) { r.setAttribute('visibility', 'hidden'); return; }
+    useGeom(s.__g); r.setAttribute('x', XS(Y[i]) - Math.min(34, STEP) / 2); r.setAttribute('visibility', 'visible');
+  });
+  const attachSc = sc => {
   sc.addEventListener('click', e => {
     if (e.target.closest('.rlink')) return;
+    { const s0 = e.target.closest('svg'); if (s0 && s0.__g) useGeom(s0.__g); }
     const nl = e.target.closest('.nlink');
     if (nl) { toggleHl(nl.dataset.p); return; }
     const c = e.target.closest('circle[data-i]');
@@ -971,13 +996,9 @@ const hideTip = () => { $('tip').hidden = true; };
       if (ny.d <= Math.max(STEP / 2, 14)) { stop(); setYear(ny.i); yearTip(e, ny.i); }
     }
   });
-  const hoverBand = i => $('scroller').querySelectorAll('.hband').forEach(r => {
-    if (i == null) r.setAttribute('visibility', 'hidden');
-    else { r.setAttribute('x', XS(Y[i]) - Math.min(34, STEP) / 2); r.setAttribute('visibility', 'visible'); }
-  });
   sc.addEventListener('mousemove', e => {
     const hsvg = e.target.closest('svg');
-    if (hsvg) { const ny0 = nearestYear(svgPoint(e, hsvg).x); hoverBand(ny0.d <= Math.max(STEP / 2, 14) ? ny0.i : null); } else hoverBand(null);
+    if (hsvg && hsvg.__g) { useGeom(hsvg.__g); const ny0 = nearestYear(svgPoint(e, hsvg).x); hoverBand(ny0.d <= Math.max(STEP / 2, 14) ? ny0.i : null); useGeom(hsvg.__g); } else hoverBand(null);
     const g = e.target.closest('.pv');
     const p = g ? g.dataset.p : null;
     if (p !== S.hover) { S.hover = p; applyHover(); }
@@ -991,6 +1012,8 @@ const hideTip = () => { $('tip').hidden = true; };
     hideTip();
   });
   sc.addEventListener('mouseleave', () => { S.hover = null; applyHover(); hideTip(); hoverBand(null); });
+  };
+  [$('scroller'), $('scrollerR')].forEach(attachSc);
 
   const rows = $('rows');
   const pick = e => { if (e.target.closest('.rlink')) return; const li = e.target.closest('.row'); if (li && li.dataset.p) toggleHl(li.dataset.p); };
@@ -1008,7 +1031,7 @@ const hideTip = () => { $('tip').hidden = true; };
     stop(); setYear(best);
     const ns = $('minis').querySelector(`svg.mini[data-m="${key}"]`); if (ns) miniTip(e, ns);
   });
-  document.addEventListener('pointerdown', e => { if (!e.target.closest('#scroller, #minis')) hideTip(); });
+  document.addEventListener('pointerdown', e => { if (!e.target.closest('#scroller, #scrollerR, #minis')) hideTip(); });
   let rz = null;
   window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { renderRace(); renderBump(); renderRate(); applyHover(); scrollHint(); }, 150); });
 
